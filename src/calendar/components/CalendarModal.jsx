@@ -1,13 +1,16 @@
 
+import { useEffect, useMemo, useState } from "react";
 import { addHours, differenceInSeconds } from "date-fns";
+
 import Swal from "sweetalert2";
 import 'sweetalert2/dist/sweetalert2.min.css';
 
-import { useEffect, useMemo, useState } from "react";
 import Modal from "react-modal";
+
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import es from "date-fns/locale/es";
+
 import { useCalendarStore, useUiStore } from "../../hooks";
 
 registerLocale('es', es);
@@ -86,9 +89,6 @@ export const CalendarModal = () => {
     }
 
     if(formValues.title.length <= 0) return;
-
-    console.log(formValues);
-
     await startSavingEvent(formValues);
     closeDateModal();
     setFormSubmitted(false);
@@ -109,8 +109,9 @@ export const CalendarModal = () => {
       <form className="container" onSubmit={ onSubmit }>
 
         <div className="form-group mb-2">
-          <label>Fecha y hora inicio</label>
+          <label htmlFor="date-start">Fecha y hora inicio</label>
           <DatePicker 
+            id="date-start"
             selected={formValues.start}
             onChange={(event) => onDateChanged(event, 'start')}
             className="form-control"
@@ -122,8 +123,9 @@ export const CalendarModal = () => {
         </div>
 
         <div className="form-group mb-2">
-          <label>Fecha y hora fin</label>
+          <label htmlFor="date-end">Fecha y hora fin</label>
           <DatePicker 
+            id="date-end"
             minDate={formValues.start}
             selected={formValues.end}
             onChange={(event) => onDateChanged(event, 'end')}
@@ -168,7 +170,7 @@ export const CalendarModal = () => {
           className="btn btn-outline-primary btn-block"
         >
           <i className="far fa-save"></i>
-          <span>Guardar</span>
+          <span> Guardar</span>
         </button>
 
       </form>
