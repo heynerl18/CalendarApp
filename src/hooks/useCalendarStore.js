@@ -5,7 +5,7 @@ import { onAddNewEvent, onDeleteEvent, onLoadEvents, onSetActiveEvent, onUpdateE
 import calendarApi from "../api/calendarApi";
 import { convertEventsToDateEvents } from "../helpers";
 import Swal from "sweetalert2";
-
+import { showAlert } from "../utils/alert";
 
 export const useCalendarStore = () => {
 
@@ -22,18 +22,28 @@ export const useCalendarStore = () => {
 
     try {
 
+      Swal.fire({
+        title: 'Guardando...',
+        text: 'Por favor, espera',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
       if(calendarEvent.id){
         // * actualizando
-        const { data } = await calendarApi.put(`/events/${ calendarEvent.id }`, calendarEvent);
+        await calendarApi.put(`/events/${ calendarEvent.id }`, calendarEvent);
         dispatch(onUpdateEvent({ ...calendarEvent, user }));
-        return;
+        showAlert('El evento se guardó correctamente.', 'success');
+      } else {
+        // * Creando
+        const { data } = await calendarApi.post('/events', calendarEvent);
+        dispatch(onAddNewEvent({ ...calendarEvent, id: data.eventSaved.id, user }));
+        showAlert('El evento se creó correctamente.', 'success');
       }
-      // * Creando
-      const { data } = await calendarApi.post('/events', calendarEvent);
-      dispatch(onAddNewEvent({ ...calendarEvent, id: data.eventSaved.id, user }));
       
     } catch (error) {
-      console.log(error);
       Swal.fire('Error al guadar', error.response.data.msg, 'error');
     }
 
@@ -44,21 +54,19 @@ export const useCalendarStore = () => {
     try {
       await calendarApi.delete(`/events/${ activeEvent.id }`);
       dispatch(onDeleteEvent());
+      Swal.fire({ title: "¡Eliminado!", text: "El evento ha sido eliminado correctamente.",icon: "success" });
     } catch (error) {
-      console.log(error);
       Swal.fire('Error al eliminar', error.response.data.msg, 'error');
     }
   }
 
   const startLoadingEvents = async() => {
     try {
-
       const { data } = await calendarApi.get('/events');
       const events = convertEventsToDateEvents(data.events);
       dispatch(onLoadEvents(events));
     } catch (error) {
       console.log('Error cargando eventos');
-      console.log(error);
     }
   }
 

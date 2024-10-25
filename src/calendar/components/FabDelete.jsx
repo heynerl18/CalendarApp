@@ -1,13 +1,18 @@
 
 import { useCalendarStore } from "../../hooks";
-
+import { showDeleteConfirmation } from "../../utils/alert";
+import Swal from "sweetalert2";
 
 export const FabDelete = () => {
 
   const { startDeletingEvent, hasEventSelected } = useCalendarStore();
 
-  const handleDelete = () => {
-    startDeletingEvent();
+  const handleDelete = async() => {
+
+    const isConfirmed = await showDeleteConfirmation();
+    if(isConfirmed){
+      startDeletingEvent();
+    }
   }
   return (
     <button

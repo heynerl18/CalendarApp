@@ -21,7 +21,8 @@ export const CalendarPage = () => {
       backgroundColor: isMyEvent ? '#347CF7' : '#465660',
       borderRadius: '0px',
       opacity: 0.8,
-      color: 'white'
+      color: 'white',
+      whiteSpace: 'nowrap',
     }
 
     return {
